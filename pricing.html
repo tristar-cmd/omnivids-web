@@ -21,8 +21,9 @@
         .features { list-style: none; padding: 0; margin: 0 0 30px 0; color: var(--text-muted); }
         .features li { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .features li::before { content: '✓'; color: var(--primary); font-weight: bold; }
-        .btn { display: block; text-align: center; background: white; color: var(--bg); text-decoration: none; padding: 12px; border-radius: 8px; font-weight: bold; transition: all 0.2s; }
+        .btn { display: block; text-align: center; background: white; color: var(--bg); text-decoration: none; padding: 12px; border-radius: 8px; font-weight: bold; transition: all 0.2s; border: none; width: 100%; font-size: 1rem; cursor: pointer; font-family: inherit; }
         .btn:hover { background: var(--primary); color: white; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         footer { padding: 30px; border-top: 1px solid #334155; margin-top: auto; color: var(--text-muted); }
         footer a { color: var(--text-muted); text-decoration: none; margin: 0 10px; }
         footer a:hover { color: white; }
@@ -36,14 +37,14 @@
         <div class="pricing-grid">
             <div class="card">
                 <h2>Pro Plan</h2>
-                <div class="price">$4.99<span>/month</span></div>
+                <div class="price" data-paddle-price="pro">$4.99<span>/month</span></div>
                 <ul class="features">
                     <li>Unlimited Media Downloads</li>
                     <li>Priority Processing</li>
                     <li>No Watermarks</li>
                     <li>24/7 Email Support</li>
                 </ul>
-                <a href="https://omnivids.lemonsqueezy.com/checkout/buy/150cfd48-e413-4c6e-9a21-b508629547ca" class="btn">Get Started</a>
+                <button type="button" class="btn" data-paddle-buy="pro">Get Started</button>
             </div>
             <div class="card" style="border-color: var(--primary); position: relative;">
                 <div style="position: absolute; top: -12px; right: 20px; background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">POPULAR</div>
@@ -63,5 +64,82 @@
         <p>&copy; 2026 Tristar Labs. All rights reserved.</p>
         <a href="/">Home</a> | <a href="/terms.html">Terms</a> | <a href="/privacy.html">Privacy</a> | <a href="/refund.html">Refund</a>
     </footer>
+
+    <!--
+      OMNIVIDS — Paddle.js entegrasyonu (SANDBOX)
+
+      TODO (bunlar tamamlanmadan checkout ÇALIŞMAZ):
+      1. Paddle dashboard > Catalog > Products altında "Pro" ürünü ve $4.99/ay (ya da
+         onaylanacak nihai fiyat) fiyatını oluştur, oradan gelen Price ID'yi
+         PRICE_ID_PRO yerine yapıştır.
+      2. Canlıya geçerken:
+         - Paddle.Environment.set("sandbox") satırını KALDIR
+         - PADDLE_CLIENT_TOKEN'ı live_ ile başlayan token ile değiştir
+         - PRICE_ID_PRO'yu live catalog'daki price ID ile değiştir
+    -->
+    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+    <script>
+      (function () {
+        var PADDLE_CLIENT_TOKEN = "test_3a2dc77655771c595b8de2fa6c9"; // sandbox client-side token
+        var PRICE_ID_PRO = "PLACEHOLDER_PRO_PRICE_ID"; // dashboard'dan alınınca doldurulacak
+
+        Paddle.Environment.set("sandbox"); // canlıya geçerken bu satırı sil
+        Paddle.Initialize({
+          token: PADDLE_CLIENT_TOKEN,
+          eventCallback: function (event) {
+            if (event.name === "checkout.completed") {
+              console.log("Checkout completed", event.data);
+              // Ödeme sonrası kullanıcıya teşekkür/yönlendirme burada eklenebilir
+            }
+          }
+        });
+
+        function priceIdReady(id) {
+          return id && id.indexOf("PLACEHOLDER") !== 0;
+        }
+
+        // Lokalize fiyatları çek (Price ID tanımlıysa)
+        function renderPrices() {
+          if (!priceIdReady(PRICE_ID_PRO)) return; // henüz dashboard'da price oluşturulmadı
+          Paddle.PricePreview({
+            items: [{ priceId: PRICE_ID_PRO, quantity: 1 }]
+          }).then(function (result) {
+            var el = document.querySelector('[data-paddle-price="pro"]');
+            var item = result.data.details.lineItems[0];
+            if (el && item) {
+              el.innerHTML = item.formattedTotals.total + '<span>/month</span>';
+            }
+          }).catch(function (err) {
+            console.error("Paddle PricePreview error:", err);
+          });
+        }
+
+        function openCheckout(priceId, button) {
+          if (!priceIdReady(priceId)) {
+            alert("Ödeme sistemi henüz kurulum aşamasında, birazdan tekrar dene.");
+            return;
+          }
+          Paddle.Checkout.open({
+            items: [{ priceId: priceId, quantity: 1 }]
+            // Giriş yapmış kullanıcı varsa email prefill edilebilir:
+            // customer: { email: currentUserEmail }
+          });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+          renderPrices();
+
+          var proBtn = document.querySelector('[data-paddle-buy="pro"]');
+          if (proBtn) {
+            proBtn.addEventListener("click", function (e) {
+              e.preventDefault();
+              openCheckout(PRICE_ID_PRO, proBtn);
+            });
+          }
+          // Team plan bilinçli olarak checkout'a bağlanmadı — "Contact Sales" olarak
+          // kalıyor. İstersen bunu da self-serve checkout'a çevirebiliriz.
+        });
+      })();
+    </script>
 </body>
 </html>
