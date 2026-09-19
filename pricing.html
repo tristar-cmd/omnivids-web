@@ -119,10 +119,22 @@
             alert("Ödeme sistemi henüz kurulum aşamasında, birazdan tekrar dene.");
             return;
           }
+
+          // Backend webhook'u aboneliği doğru Supabase hesabına bağlayabilsin diye,
+          // kullanıcının OmniVids'e kayıt olurken kullandığı email'i istiyoruz ve
+          // Paddle'a custom_data olarak gönderiyoruz. Checkout ekranındaki email
+          // alanına da aynısını otomatik dolduruyoruz (ekstra yazmasın diye).
+          var accountEmail = window.prompt(
+            "Please enter the email address you used to sign up for your OmniVids account:"
+          );
+          if (!accountEmail) {
+            return; // kullanıcı iptal etti / boş bıraktı
+          }
+
           Paddle.Checkout.open({
-            items: [{ priceId: priceId, quantity: 1 }]
-            // Giriş yapmış kullanıcı varsa email prefill edilebilir:
-            // customer: { email: currentUserEmail }
+            items: [{ priceId: priceId, quantity: 1 }],
+            customer: { email: accountEmail },
+            customData: { email: accountEmail }
           });
         }
 
