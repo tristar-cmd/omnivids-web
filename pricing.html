@@ -68,11 +68,10 @@
     <!--
       OMNIVIDS — Paddle.js entegrasyonu (SANDBOX)
 
-      TODO (bunlar tamamlanmadan checkout ÇALIŞMAZ):
-      1. Paddle dashboard > Catalog > Products altında "Pro" ürünü ve $4.99/ay (ya da
-         onaylanacak nihai fiyat) fiyatını oluştur, oradan gelen Price ID'yi
-         PRICE_ID_PRO yerine yapıştır.
-      2. Canlıya geçerken:
+      DURUM: Pro planı için Price ID tanımlandı (pri_01m2zvtq9w6baz004pben16t9z, sandbox).
+
+      TODO:
+      1. Canlıya geçerken:
          - Paddle.Environment.set("sandbox") satırını KALDIR
          - PADDLE_CLIENT_TOKEN'ı live_ ile başlayan token ile değiştir
          - PRICE_ID_PRO'yu live catalog'daki price ID ile değiştir
@@ -81,7 +80,7 @@
     <script>
       (function () {
         var PADDLE_CLIENT_TOKEN = "test_3a2dc77655771c595b8de2fa6c9"; // sandbox client-side token
-        var PRICE_ID_PRO = "PLACEHOLDER_PRO_PRICE_ID"; // dashboard'dan alınınca doldurulacak
+        var PRICE_ID_PRO = "pri_01m2zvtq9w6baz004pben16t9z";
 
         Paddle.Environment.set("sandbox"); // canlıya geçerken bu satırı sil
         Paddle.Initialize({
