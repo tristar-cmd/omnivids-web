@@ -67,21 +67,17 @@
     <!--
       OMNIVIDS — Paddle.js entegrasyonu (SANDBOX)
 
-      DURUM: Pro planı için Price ID tanımlandı (pri_01m2zvtq9w6baz004pben16t9z, sandbox).
+      DURUM: LIVE hesaba geçildi. Pro planı Price ID: pri_01m370b5yt48m2dxwyyzv16gqf
 
       TODO:
-      1. Canlıya geçerken:
-         - Paddle.Environment.set("sandbox") satırını KALDIR
-         - PADDLE_CLIENT_TOKEN'ı live_ ile başlayan token ile değiştir
-         - PRICE_ID_PRO'yu live catalog'daki price ID ile değiştir
+      1. (Tamamlandı — bu satır artık uygulanmış durumda, referans için bırakıldı)
     -->
     <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
     <script>
       (function () {
-        var PADDLE_CLIENT_TOKEN = "test_3a2dc77655771c595b8de2fa6c9"; // sandbox client-side token
-        var PRICE_ID_PRO = "pri_01m2zvtq9w6baz004pben16t9z";
+        var PADDLE_CLIENT_TOKEN = "live_ec800667215c3e175d276ef6641"; // LIVE client-side token
+        var PRICE_ID_PRO = "pri_01m370b5yt48m2dxwyyzv16gqf"; // LIVE price ID
 
-        Paddle.Environment.set("sandbox"); // canlıya geçerken bu satırı sil
         Paddle.Initialize({
           token: PADDLE_CLIENT_TOKEN,
           eventCallback: function (event) {
